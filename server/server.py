@@ -152,23 +152,22 @@ def main():
             # NB: PUT and GET MUST have a space after the word to satisfy the requirement of 4 bytes ACTION word must be received at the first instance:
             data = cli_sock.recv(4)
             data_decoded = data.decode()
-            print(f"data received in the server func is: {data_decoded}")
             
             # check what ACTION the client is requesting:
             # if ACTION is LIST, do not wait for a filename because it is not needed for this action:
             if data_decoded.startswith("LIST"):
-                print(f"Action found is LIST")
                 ACTION = "LIST"
+                print(f"Action required is {ACTION}")
                 status = Common.send_listing(cli_sock)
             
             elif data_decoded[:3] == "PUT":
-                print(f"Action found is PUT")
                 ACTION = "PUT"
+                print(f"Action required is {ACTION}")
                 status = Common.recv_file(cli_sock)
                 
             elif data_decoded[:3] == "GET":
-                print(f"Action found is GET")
                 ACTION = "GET"
+                print(f"Action required is {ACTION}")
                 print(f"running send_file now..")
                 status = Common.send_file(cli_sock) #! need to make send_file like recv_file, to get the filename from data stream
                 print(f"status from send_file is {status}")
@@ -199,8 +198,8 @@ def main():
                 # print message in server screen:
                 print(message)
                 # then send it to client
-                cli_sock.send(message)
-                # raise Exception
+                cli_sock.sendall(message)
+                
                 
                 
             
@@ -208,21 +207,31 @@ def main():
             report = f"{cli_addr}: [{ACTION} request"
             # if status is true and action is put or get, add FILENAME to the report:
             if status and ACTION in ["PUT", "GET"]:
-                report += f" ] ACTION COMPLETED." #!try adding {FILENAME}
+                report += f"] ACTION COMPLETED SUCCESSFULLY." #!try adding {FILENAME}
+
+                # now, print the report in server's screen and send it to client:
+                cli_sock.sendall(report.encode())
+                print(report)
                 
 
             # if status is true and action is list, complete the report normally:
             elif status:
-                report += f"] ACTION COMPLETED successfully"
+                report += f"] ACTION COMPLETED SUCCESSFULLY."
+
+                # now, print the report in server's screen and send it to client:
+                cli_sock.sendall(report.encode())
+                print(report)
             
-            # if something wrong happend:
+            # if something went wrong:
             else:
                 report += f"] ACTION FAILED."
+                print(report)
+                raise ConnectionResetError
             
             
-            # now, print the report in server's screen and send it to client:
-            print(report)
-            cli_sock.send(report.encode())
+            
+            
+            
                 
                 
                 
@@ -250,6 +259,13 @@ def main():
                 #!    break
                     # print("Client closed connection.")
                     
+        except ConnectionResetError as CRE:
+            print(f"Client closed connection")
+            print(CRE)
+            
+        # except ValueError as VE:
+        #     print(f"Usage: <host name or IP address> <port number> <action word> <filename>")
+        #     print(VE)
                     
         except Exception as e:
             print(e)

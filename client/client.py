@@ -15,6 +15,7 @@ def main():
     # The server's address is a tuple, comprising the server's IP address or hostname, and port number
     srv_addr = (sys.argv[1], int(sys.argv[2]))
     
+    
     ACTION = str(sys.argv[3])
     if ACTION in ["PUT", "GET"]:
         # we only have filename argument if action is put or get:
@@ -47,6 +48,9 @@ def main():
         print("Connected...")
         
     # handle errors:
+    except ConnectionRefusedError as CRE:
+        print(f"Server is not up or credentials provided are invalid.")
+        
     except Exception as e: #! add exceptions
         # Print the exception message
         print(e)
@@ -78,6 +82,12 @@ def main():
             # cli_sock.sendall(FILENAME.encode())
             # cli_sock.send("END_FILENAME".encode())
             status = Common.recv_file(cli_sock, FILENAME)
+            # only if recv_file return True, wait for a response from server:
+            if status:
+                print("Action from client side was completed successfully.")
+                # print(f"Waiting for a response from server..")
+                # respond = cli_sock.recv(4096)
+                # print(f"=> Server {srv_addr}: {respond.decode()}")
             
         elif ACTION == "PUT " :
             print(f"Action is {ACTION}")
@@ -85,23 +95,43 @@ def main():
             # cli_sock.sendall(FILENAME.encode())
             # cli_sock.sendall("END_FILENAME".encode())
             status = Common.send_file(cli_sock, FILENAME)
+            # wait for a response from server:
+            # print(f"Waiting for a response from server..")
+            
+            # only if send_file return True, wait for a response from server:
+            if status:
+                print("Action from client side was completed successfully.")
+                # print(f"Waiting for a response from server..")
+                # respond = cli_sock.recv(4096)
+                # print(f"=> Server {srv_addr}: {respond.decode()}")
             
         else:
             print(f"Action is not known")
             raise ValueError
-        
+    
+    
+        # print a report:
+        # print("Action from client side ", end="")
+        if not status:
+            print("Action from client side failed.")
+            # reset the connection:
+            raise ConnectionResetError
+            
+            # get a report from server then print it:
+            # print(f"Waiting for a response from server..")
+            # respond = cli_sock.recv(4096)
+            # print(f"=> Server {srv_addr}: {respond.decode()}")
+            
+        # else:
+        #     print("failed.")
+            # reset the connection:
+            # raise ConnectionResetError
 
-        # get a report from server then print it:
-        print(f"Waiting for a response from server..")
-        respond = cli_sock.recv(4096)
-        print(f"{srv_addr}: {respond.decode()}")
         
-        # report about client status:
-        print("Action from client side ", end="")
-        if status:
-            print("was completed successfully.")
-        else:
-            print("failed.")
+            
+        
+      
+        
         
         
         # report what happened:
@@ -144,7 +174,20 @@ def main():
             
     except ValueError as VE:
         print(f"Error: It is most likely that you passed a wrong argument.")
+        print(f"Usage: <host name or IP address> <port number> <action word> <filename>")
         print(VE)
+        print(traceback.format_exc())
+        
+    except ConnectionResetError as CRE:
+        print(f"The server requested exit.")
+        print(CRE)
+        
+    except ConnectionAbortedError as CAE:
+        print(f"The server abandoned the connection.")
+        print(CAE)
+        
+    except Exception as e:
+        print(e)
 
     finally:
         """
