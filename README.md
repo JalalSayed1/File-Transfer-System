@@ -33,4 +33,4 @@ client.py file:
 ## Thing I learnt when developing this:
 
  1. Networking and using the Socket library in Python.
- 2. Developed my problem solving skills and the ability to work on a relatively bigger project than I used to.
+ 2. Developed my problem solving skills and the ability to work on a bigger project than I used to.
