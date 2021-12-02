@@ -30,7 +30,7 @@ client.py file:
  3. When using `PUT`, make sure the file required to be uploaded to the server is in the client folder.
  4. `FILENAME` must be the full filename of the file to be uploaded/downloaded with its extension. E.g. `picture.jpg`.
 
-## Thing I learnt when making this:
+## What did I learn from this:
 
  1. Networking and using the Socket library in Python.
  2. Developed my problem solving skills and the ability to work on a bigger project than I used to.
