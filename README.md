@@ -1,8 +1,10 @@
 # About the project:
 
- 1. It only works on a local LAN network. Therefore, it cannot transfer files to a host outside your local network.
- 2. It does not have a GUI. Therefore, you need to run both client and server scripts from the command line.
- 3. It only works on windows operating systems.
+ 1. This was the first accessed exercise for my Networking and Operating Systems course in Level 2 - semester 1 on 29/10/2021.
+ 2. I achieved in this project a grade of A4 ≈ (74% - 78%).
+ 3. It only works on a local LAN network. Therefore, it cannot transfer files to a host outside your local network.
+ 4. It does not have a GUI. Therefore, you need to run both client and server scripts from the command line.
+ 5. It only works on windows operating systems.
 
 # How to use:
 
